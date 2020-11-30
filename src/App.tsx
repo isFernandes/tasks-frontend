@@ -1,33 +1,36 @@
-import React, {FormEvent, useState} from "react";
+import React, { FormEvent, useState, useEffect } from "react";
 import styled from "styled-components";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
 import "./App.css";
 import mainImg from "./assets/mainImg.png";
-import Task from "./components/Task";
-import {api} from './services/api';
+import TaskItem, { Task } from "./components/Task";
+import { api, create, doneAllTask, undoneAllTask } from "./services/api";
 
-const App: React.FC =() => {
-  const [description, setDescription] = useState('');
-  const [done, setDone] = useState(false);
+const App: React.FC = () => {
+  const [description, setDescription] = useState("");
+  const [tasks, setTasks] = useState([]);
 
-  const createTask = async (e: FormEvent)=>{
+  useEffect(() => {
+    const getTasks = async () => {
+      const response = await api.get("/getAll");
+
+      setTasks(response.data);
+    };
+
+    getTasks();
+  }, [tasks]);
+
+  const createTask = async (e: FormEvent) => {
     e.preventDefault();
-    setDone(false);
-    await api.post('/createTask', {
-      description,
-      done
-    })
-    .then(()=>{
-        alert("Tarefa criada com sucesso!");
-      })
-    .catch(()=>{
-        alert("Erro ao criar sua tarefa! :(");
-      });
-
-    setDescription('');
-  }
+    if (description !== "") {
+      await create(description);
+    }else{
+      alert("Conteudo da tarefa esta vazio, por gentileza insira algo!")
+    }
+    setDescription("");
+  };
 
   return (
     <Container>
@@ -39,22 +42,33 @@ const App: React.FC =() => {
             id="addTaskFiel"
             label="Adicione uma tarefa..."
             variant="standard"
-            onChange={(e)=>{setDescription(e.target.value)}}
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
           />
-          <Button 
-          className="button" variant="contained" color="primary"
-          type="submit"
+          <Button
+            className="button"
+            variant="contained"
+            color="primary"
+            type="submit"
           >
             Adicionar
           </Button>
         </FormArea>
       </EnterData>
       <List>
-        <Task />
+        {tasks.map((task: Task) => {
+          return <TaskItem key={task._id} task={task} />;
+        })}
       </List>
+
+        <ButtonArea>
+          <DefaulButton id="doneAll" onClick={()=>{doneAllTask()}}>Finalizar todas</DefaulButton>
+          <DefaulButton id="undoneAll" onClick={()=>{undoneAllTask()}}>Reiniciar todas</DefaulButton>
+        </ButtonArea>
     </Container>
   );
-}
+};
 
 export default App;
 
@@ -97,4 +111,24 @@ const List = styled.div`
   justify-content: flex-start;
   width: 100%;
   align-items: center;
+  max-height: 
 `;
+
+const ButtonArea = styled.div`
+  display: flex;
+  align-self: flex-end;
+  flex:1;
+  max-height: 55px;
+  min-width: 300px;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 25px;
+
+`;
+
+const DefaulButton = styled.button`
+  padding:10px;
+  border: 0px solid black;
+  border-radius: 5px;
+`;
+

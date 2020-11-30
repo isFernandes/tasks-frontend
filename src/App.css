@@ -3,6 +3,26 @@
     align-self: center;
 }
 
+#doneAll:hover{
+  background-color: rgba(34, 153, 34, 0.83);
+  opacity: 0.8;
+  border: 2px solid  rgba(95, 242, 95, 0.83);
+  font-weight: bold;
+  color: whitesmoke;
+}
+
+#undoneAll:hover{
+  background-color:rgb(255, 0, 0);
+  opacity: 0.8;
+  border: 2px solid  rgb(238, 60, 60);
+  font-weight: bold;
+  color: whitesmoke;
+}
+
+
+.text-button:hover{
+}
+
 @media screen and (max-width: 600px) {
     .formArea {
       display: flex;
@@ -10,4 +30,4 @@
       justify-content: center;
       align-items: center;
     }
-  }
+}
